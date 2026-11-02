@@ -713,6 +713,19 @@ export class ConfigVariables {
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.STORAGE_CONFIG,
+    isSensitive: true,
+    description:
+      'Vercel Blob read-write token. Required when STORAGE_TYPE is VERCEL_BLOB; Vercel sets it automatically when a Blob store is connected to the project.',
+    type: ConfigVariableType.STRING,
+    isEnvOnly: true,
+  })
+  @ValidateIf((env) => env.STORAGE_TYPE === StorageDriverType.VERCEL_BLOB)
+  @IsString()
+  @IsNotEmpty()
+  BLOB_READ_WRITE_TOKEN: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.STORAGE_CONFIG,
     description:
       'Maximum tarball upload size in bytes for application registration',
     type: ConfigVariableType.NUMBER,

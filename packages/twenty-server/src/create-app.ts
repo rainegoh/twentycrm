@@ -27,7 +27,6 @@ import './instrument';
 import { settings } from './engine/constants/settings';
 import { enableValidationMetadataCache } from './utils/enable-validation-metadata-cache.util';
 
-// Shared by main.ts (long-lived server) and serverless.ts (Vercel function).
 export const createApp = async (): Promise<NestExpressApplication> => {
   enableValidationMetadataCache();
   setPgDateTypeParser();

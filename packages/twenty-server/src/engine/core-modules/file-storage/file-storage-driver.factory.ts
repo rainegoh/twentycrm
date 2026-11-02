@@ -8,6 +8,7 @@ import { StorageDriverType } from 'src/engine/core-modules/file-storage/interfac
 import { LocalDriver } from 'src/engine/core-modules/file-storage/drivers/local.driver';
 import { S3Driver } from 'src/engine/core-modules/file-storage/drivers/s3.driver';
 import { ValidatedStorageDriver } from 'src/engine/core-modules/file-storage/drivers/validated-storage.driver';
+import { VercelBlobDriver } from 'src/engine/core-modules/file-storage/drivers/vercel-blob.driver';
 import { DriverFactoryBase } from 'src/engine/core-modules/twenty-config/dynamic-factory.base';
 import { ConfigVariablesGroup } from 'src/engine/core-modules/twenty-config/enums/config-variables-group.enum';
 import { ConfigGroupHashService } from 'src/engine/core-modules/twenty-config/services/config-group-hash.service';
@@ -38,6 +39,14 @@ export class FileStorageDriverFactory extends DriverFactoryBase<StorageDriver> {
       );
 
       return `s3|${storageConfigHash}`;
+    }
+
+    if (storageType === StorageDriverType.VERCEL_BLOB) {
+      const storageConfigHash = this.configGroupHashService.computeHash(
+        ConfigVariablesGroup.STORAGE_CONFIG,
+      );
+
+      return `vercel-blob|${storageConfigHash}`;
     }
 
     throw new Error(`Unsupported storage type: ${storageType}`);
@@ -84,6 +93,13 @@ export class FileStorageDriverFactory extends DriverFactoryBase<StorageDriver> {
             : fromNodeProviderChain({ clientConfig: { region } }),
           forcePathStyle: true,
           region: region ?? '',
+        });
+        break;
+      }
+
+      case StorageDriverType.VERCEL_BLOB: {
+        rawDriver = new VercelBlobDriver({
+          token: this.twentyConfigService.get('BLOB_READ_WRITE_TOKEN'),
         });
         break;
       }
